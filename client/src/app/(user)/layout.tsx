@@ -1,35 +1,26 @@
 "use client";
 
-import { Sidebar, MobileHeader } from '@/modules/user/components/Sidebar'
-import React, { useState } from 'react'
+import AuthGuard from "@/components/AuthGuard";
+import Sidebar from "@/modules/user/components/Sidebar";
 
-const UserLayout = ({children} : {children: React.ReactNode}) => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
+const UserLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
-    <div className='flex min-h-screen'>
-      {/* Sidebar */}
-      <Sidebar 
-        isMobileOpen={isMobileMenuOpen}
-        onMobileToggle={toggleMobileMenu}
-      />
-      
-      {/* Main Content */}
-      <div className='flex-1 flex flex-col'>
-        {/* Mobile Header - only shows on mobile */}
-        <MobileHeader onMenuClick={() => setIsMobileMenuOpen(true)} />
-        
-        {/* Page Content */}
-        <main className='flex-1 p-4 md:p-6'>
-          {children}
-        </main>
-      </div>
-    </div>
-  )
-}
+    <AuthGuard>
+      <div className="flex min-h-screen">
+        {/* Sidebar */}
+        <Sidebar />
 
-export default UserLayout 
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col">
+          
+
+          {/* Page Content */}
+          <main className="flex-1 p-4 md:p-6">{children}</main>
+        </div>
+      </div>
+    </AuthGuard>
+  );
+};
+
+export default UserLayout;
