@@ -121,4 +121,47 @@ export const useRoadmapStore = create<RoadmapState>((set, get) => ({
       throw error;
     }
   },
+
+  addLevel: async (roadmapId, levelData, token) => {
+    try {
+      const response = await axios.post(`${ROADMAP_API_ROUTE}/${roadmapId}/levels`, levelData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      // Update the specific roadmap in state
+      set(state => ({
+        roadmaps: state.roadmaps.map(r => r._id === roadmapId ? response.data : r)
+      }));
+      return response.data;
+    } catch (error: any) {
+      throw error;
+    }
+  },
+
+  addNode: async (roadmapId, levelId, nodeData, token) => {
+    try {
+      const response = await axios.post(`${ROADMAP_API_ROUTE}/${roadmapId}/levels/${levelId}/nodes`, nodeData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      set(state => ({
+        roadmaps: state.roadmaps.map(r => r._id === roadmapId ? response.data : r)
+      }));
+      return response.data;
+    } catch (error: any) {
+      throw error;
+    }
+  },
+
+  addTopic: async (roadmapId, levelId, nodeId, topicData, token) => {
+    try {
+      const response = await axios.post(`${ROADMAP_API_ROUTE}/${roadmapId}/levels/${levelId}/nodes/${nodeId}/topics`, topicData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      set(state => ({
+        roadmaps: state.roadmaps.map(r => r._id === roadmapId ? response.data : r)
+      }));
+      return response.data;
+    } catch (error: any) {
+      throw error;
+    }
+  },
 }));

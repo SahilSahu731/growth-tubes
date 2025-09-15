@@ -10,6 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Save, ArrowLeft, Trash2, FolderPlus, BookOpen } from "lucide-react";
+import { useRoadmapStore } from "@/store/roadmapStore";
+import { useAuthStore } from "@/store/authStore";
+import { toast } from "sonner";
 
 interface Topic {
   id: string;
@@ -53,64 +56,62 @@ export default function RoadmapEditor({ roadmap, onSave, onBack }: RoadmapEditor
   const [selectedLevel, setSelectedLevel] = useState<Level | null>(null);
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [activeTab, setActiveTab] = useState("levels");
+  const { addLevel: addLevelAPI, addNode: addNodeAPI, addTopic: addTopicAPI } = useRoadmapStore();
+  const { token } = useAuthStore();
 
-  const addLevel = () => {
-    const newLevel: Level = {
-      id: `level-${Date.now()}`,
-      title: "",
-      description: "",
-      order: levels.length + 1,
-      nodes: [],
-      estimatedDuration: "",
-      color: "#3B82F6",
-    };
-    setLevels([...levels, newLevel]);
-    setSelectedLevel(newLevel);
+  const handleAddLevel = async () => {
+    try {
+      const levelData = {
+        title: `Level ${levels.length + 1}`,
+        description: "New level description",
+        order: levels.length + 1,
+        estimatedDuration: "2 weeks",
+        color: "#3B82F6",
+      };
+      
+      const updatedRoadmap = await addLevelAPI(roadmap._id, levelData, token!);
+      setLevels(updatedRoadmap.levels);
+      toast.success('Level added successfully!');
+    } catch (error) {
+      toast.error('Failed to add level');
+    }
   };
 
-  const addNode = (levelId: string) => {
-    const newNode: Node = {
-      id: `node-${Date.now()}`,
-      title: "",
-      description: "",
-      type: "topic",
-      difficulty: "beginner",
-      estimatedDuration: "",
-      topics: [],
-      position: { x: Math.random() * 400, y: Math.random() * 300 },
-      color: "#3B82F6",
-      icon: "📚",
-    };
-    
-    setLevels(levels.map(level => 
-      level.id === levelId 
-        ? { ...level, nodes: [...level.nodes, newNode] }
-        : level
-    ));
-    setSelectedNode(newNode);
+  const handleAddNode = async (levelId: string) => {
+    try {
+      const nodeData = {
+        title: "New Node",
+        description: "Node description",
+        type: "topic",
+        difficulty: "beginner",
+        estimatedDuration: "1 week",
+        position: { x: Math.random() * 400, y: Math.random() * 300 },
+        color: "#3B82F6",
+        icon: "📚",
+      };
+      
+      const updatedRoadmap = await addNodeAPI(roadmap._id, levelId, nodeData, token!);
+      setLevels(updatedRoadmap.levels);
+      toast.success('Node added successfully!');
+    } catch (error) {
+      toast.error('Failed to add node');
+    }
   };
 
-  const addTopic = (levelId: string, nodeId: string) => {
-    const newTopic: Topic = {
-      id: `topic-${Date.now()}`,
-      title: "",
-      description: "",
-      resources: [],
-      estimatedTime: "",
-    };
-    
-    setLevels(levels.map(level => 
-      level.id === levelId 
-        ? {
-            ...level,
-            nodes: level.nodes.map(node => 
-              node.id === nodeId 
-                ? { ...node, topics: [...node.topics, newTopic] }
-                : node
-            )
-          }
-        : level
-    ));
+  const handleAddTopic = async (levelId: string, nodeId: string) => {
+    try {
+      const topicData = {
+        title: "New Topic",
+        description: "Topic description",
+        estimatedTime: "30 minutes",
+      };
+      
+      const updatedRoadmap = await addTopicAPI(roadmap._id, levelId, nodeId, topicData, token!);
+      setLevels(updatedRoadmap.levels);
+      toast.success('Topic added successfully!');
+    } catch (error) {
+      toast.error('Failed to add topic');
+    }
   };
 
   const saveRoadmap = () => {
@@ -135,10 +136,6 @@ export default function RoadmapEditor({ roadmap, onSave, onBack }: RoadmapEditor
           </div>
         </div>
         <div className="flex space-x-2">
-          <Button onClick={addNode}>
-            <Plus className="w-4 h-4 mr-2" />
-            Add Node
-          </Button>
           <Button onClick={saveRoadmap} className="bg-green-600 hover:bg-green-700">
             <Save className="w-4 h-4 mr-2" />
             Save Roadmap
@@ -155,7 +152,7 @@ export default function RoadmapEditor({ roadmap, onSave, onBack }: RoadmapEditor
         <TabsContent value="levels" className="space-y-4">
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-semibold">Roadmap Levels ({levels.length})</h3>
-            <Button onClick={addLevel}>
+            <Button onClick={handleAddLevel}>
               <FolderPlus className="w-4 h-4 mr-2" />
               Add Level
             </Button>
@@ -171,7 +168,7 @@ export default function RoadmapEditor({ roadmap, onSave, onBack }: RoadmapEditor
                       <p className="text-sm text-muted-foreground">{level.nodes.length} nodes</p>
                     </div>
                     <div className="flex space-x-2">
-                      <Button size="sm" onClick={() => addNode(level.id)}>
+                      <Button size="sm" onClick={() => handleAddNode(level.id)}>
                         <Plus className="w-4 h-4 mr-1" />
                         Add Node
                       </Button>
@@ -187,7 +184,7 @@ export default function RoadmapEditor({ roadmap, onSave, onBack }: RoadmapEditor
                             <span>{node.icon}</span>
                             <span className="font-medium text-sm">{node.title || 'Untitled'}</span>
                           </div>
-                          <Button size="sm" variant="outline" onClick={() => addTopic(level.id, node.id)}>
+                          <Button size="sm" variant="outline" onClick={() => handleAddTopic(level.id, node.id)}>
                             <BookOpen className="w-3 h-3" />
                           </Button>
                         </div>
@@ -213,7 +210,7 @@ export default function RoadmapEditor({ roadmap, onSave, onBack }: RoadmapEditor
                 <CardContent className="flex items-center justify-center h-32">
                   <div className="text-center">
                     <p className="text-muted-foreground mb-4">No levels yet. Create your first level.</p>
-                    <Button onClick={addLevel}>
+                    <Button onClick={handleAddLevel}>
                       <FolderPlus className="w-4 h-4 mr-2" />
                       Add First Level
                     </Button>

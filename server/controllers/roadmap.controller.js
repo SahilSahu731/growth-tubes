@@ -131,6 +131,99 @@ export const toggleRoadmapStatus = async (req, res) => {
   }
 };
 
+// Add level to roadmap (Admin only)
+export const addLevel = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const levelData = {
+      ...req.body,
+      id: `level-${Date.now()}`,
+    };
+    
+    const roadmap = await Roadmap.findByIdAndUpdate(
+      id,
+      { $push: { levels: levelData } },
+      { new: true }
+    )
+    .populate("category", "name icon color")
+    .populate("creator", "username email");
+    
+    if (!roadmap) {
+      return res.status(404).json({ message: "Roadmap not found" });
+    }
+    
+    res.status(200).json(roadmap);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Add node to level (Admin only)
+export const addNode = async (req, res) => {
+  try {
+    const { id, levelId } = req.params;
+    const nodeData = {
+      ...req.body,
+      id: `node-${Date.now()}`,
+      topics: [],
+    };
+    
+    const roadmap = await Roadmap.findOneAndUpdate(
+      { _id: id, "levels.id": levelId },
+      { $push: { "levels.$.nodes": nodeData } },
+      { new: true }
+    )
+    .populate("category", "name icon color")
+    .populate("creator", "username email");
+    
+    if (!roadmap) {
+      return res.status(404).json({ message: "Roadmap or level not found" });
+    }
+    
+    res.status(200).json(roadmap);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Add topic to node (Admin only)
+export const addTopic = async (req, res) => {
+  try {
+    const { id, levelId, nodeId } = req.params;
+    const topicData = {
+      ...req.body,
+      id: `topic-${Date.now()}`,
+      resources: [],
+    };
+    
+    const roadmap = await Roadmap.findOneAndUpdate(
+      { 
+        _id: id, 
+        "levels.id": levelId,
+        "levels.nodes.id": nodeId 
+      },
+      { $push: { "levels.$[level].nodes.$[node].topics": topicData } },
+      { 
+        new: true,
+        arrayFilters: [
+          { "level.id": levelId },
+          { "node.id": nodeId }
+        ]
+      }
+    )
+    .populate("category", "name icon color")
+    .populate("creator", "username email");
+    
+    if (!roadmap) {
+      return res.status(404).json({ message: "Roadmap, level, or node not found" });
+    }
+    
+    res.status(200).json(roadmap);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // Fork roadmap (Authenticated users)
 export const forkRoadmap = async (req, res) => {
   try {

@@ -9,7 +9,6 @@ import {
   LayoutDashboard,
   FolderOpen,
   Users,
-  BookOpen,
   FileText,
   Award,
   Settings,
@@ -19,7 +18,8 @@ import {
   HelpCircle,
   Menu,
   X,
-  Route
+  Route,
+  BookOpen
 } from 'lucide-react';
 
 const sidebarItems = [
@@ -32,11 +32,6 @@ const sidebarItems = [
     title: 'Categories',
     href: '/admin/categories',
     icon: FolderOpen,
-  },
-  {
-    title: 'Courses',
-    href: '/admin/courses',
-    icon: BookOpen,
   },
   {
     title: 'Roadmaps',
