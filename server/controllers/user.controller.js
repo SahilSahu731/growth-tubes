@@ -89,9 +89,32 @@ export const logoutUser = (req, res) => {
   res.status(200).json({ message: 'Logged out successfully' });
 };
 
-// @desc    Get current user profile
-// @route   GET /api/users/profile
-// @access  Private
 export const getUserProfile = (req, res) => {
   res.status(200).json(req.user);
+};
+
+export const updateUserProfile = async (req, res) => {
+  const user = await User.findById(req.user._id);
+
+  if (user) {
+    user.username = req.body.username || user.username;
+    user.email = req.body.email || user.email;
+    user.bio = req.body.bio || user.bio;
+    if (req.body.password) {
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(req.body.password, salt);
+    }
+
+    const updatedUser = await user.save();
+
+    res.json({
+      _id: updatedUser._id,
+      username: updatedUser.username,
+      email: updatedUser.email,
+      bio: updatedUser.bio,
+      token: generateToken(updatedUser._id),
+    });
+  } else {
+    res.status(404).json({ message: "User not found" });
+  }
 };

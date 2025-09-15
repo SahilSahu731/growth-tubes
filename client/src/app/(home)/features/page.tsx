@@ -1,7 +1,7 @@
-import CallToAction from "@/modules/components/features/CallToAction";
-import FeaturesHero from "@/modules/components/features/FeaturesHero";
-import GamificationElements from "@/modules/components/features/GamificationElements";
-import LifeModuleSection from "@/modules/components/features/LifeModuleSection";
+import CallToAction from "@/modules/home/components/CallToAction";
+import FeaturesHero from "@/modules/home/components/FeaturesHero";
+import GamificationElements from "@/modules/home/components/GamificationElements";
+import LifeModuleSection from "@/modules/home/components/LifeModuleSection";
 
 
 export default function FeaturesPage() {

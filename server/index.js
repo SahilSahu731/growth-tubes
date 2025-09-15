@@ -2,6 +2,10 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import userRoutes from './routers/user.route.js';
+import categoryRoutes from './routers/category.route.js';
+import courseRoutes from './routers/course.route.js';
+import roadmapRoutes from './routers/roadmap.route.js';
+import adminRoutes from './routers/admin.route.js';
 import connectDB from './config/db.js';
 
 dotenv.config();
@@ -23,6 +27,10 @@ app.use(cors({
 
 // Routes
 app.use('/api/users', userRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/courses', courseRoutes);
+app.use('/api/roadmaps', roadmapRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.get('/', (req, res) => {
   res.send('Hello, World!');

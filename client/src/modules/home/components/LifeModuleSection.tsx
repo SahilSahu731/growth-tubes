@@ -97,7 +97,7 @@ export default function LifeModuleSection() {
                 </CardHeader>
 
                 <div className="relative w-full h-64 md:h-auto overflow-hidden rounded-b-lg md:rounded-lg">
-                  <img src={tab.imageSrc} alt={`${tab.title} visual`} className="object-cover w-full h-full" />
+                  {/* <img src={tab.imageSrc} alt={`${tab.title} visual`} className="object-cover w-full h-full" /> */}
                 </div>
               </div>
             </Card>

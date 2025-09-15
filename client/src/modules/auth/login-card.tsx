@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FaGoogle, FaGithub, FaLinkedinIn } from "react-icons/fa";
+import { FaGoogle, FaFacebook } from "react-icons/fa";
 import { FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import {
   Card,
@@ -51,7 +51,7 @@ export default function LoginCard() {
         response.data.token
       );
       // Redirect user to a dashboard or home page
-      router.push("/user");
+      router.push("/dashboard");
     } catch (err: any) { // eslint-disable-line
       console.error("Login error:", err);
       if (err.response && err.response.data && err.response.data.message) {
@@ -65,148 +65,139 @@ export default function LoginCard() {
   };
 
   return (
-    <div className="flex min-h-[calc(100vh-80px)] items-center justify-center bg-gray-50 p-8 dark:bg-zinc-950">
-      <Card className="w-[700px] p-6 shadow-2xl dark:shadow-xl dark:shadow-indigo-500/20 border-gray-200 dark:border-zinc-700">
-        <CardHeader className="space-y-2 mt-5 text-center">
-          <CardTitle className="text-3xl font-extrabold text-gray-900 dark:text-gray-50">
-            Welcome Back
-          </CardTitle>
-          <CardDescription className="text-base text-gray-600 dark:text-gray-400">
-            Sign in to your account
-          </CardDescription>
-        </CardHeader>
-        <Separator />
-        <CardContent className="grid gap-7">
-          <form onSubmit={handleLogin} className="grid gap-7">
-            {/* Email Input */}
-            <div className="grid gap-2">
-              <Label
-                htmlFor="email"
-                className="text-sm font-medium text-gray-700 dark:text-gray-200"
+    <div className="w-full max-w-md mx-auto px-8">
+      <div className="mb-10">
+        <h1 className="text-3xl font-bold text-gray-900 mb-3">Welcome back</h1>
+        <p className="text-gray-600 text-lg">Sign in to your Growth Tubes account</p>
+      </div>
+
+        <form onSubmit={handleLogin} className="space-y-6">
+          <div>
+            <Label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              Email
+            </Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              required
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              Password
+            </Label>
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                required
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                onClick={() => setShowPassword(!showPassword)}
               >
-                Email
-              </Label>
-              <div className="relative">
-                <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="your@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="h-12 pl-12 pr-4 text-base bg-gray-100 dark:bg-zinc-800 dark:text-gray-50 dark:border-zinc-700 focus:border-indigo-500 dark:focus:border-indigo-500"
-                />
-              </div>
+                {showPassword ? (
+                  <FiEyeOff className="h-4 w-4 text-gray-400" />
+                ) : (
+                  <FiEye className="h-4 w-4 text-gray-400" />
+                )}
+              </button>
             </div>
+          </div>
 
-            {/* Password Input */}
-            <div className="grid gap-2">
-              <div className="flex items-center justify-between">
-                <Label
-                  htmlFor="password"
-                  className="text-sm font-medium text-gray-700 dark:text-gray-200"
-                >
-                  Password
-                </Label>
-              </div>
-              <div className="relative">
-                <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Your Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="h-12 pl-12 pr-12 text-base dark:bg-zinc-800 dark:text-gray-50 dark:border-zinc-700 focus:border-indigo-500 dark:focus:border-indigo-500"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0 text-gray-500 hover:bg-transparent dark:text-gray-400 dark:hover:text-gray-300"
-                  onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? (
-                    <FiEyeOff className="h-4 w-4" />
-                  ) : (
-                    <FiEye className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
-              <a
-                href="#"
-                className="text-sm font-medium text-right mt-1 hover:underline text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
-              >
-                Forgot Password?
-              </a>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <input
+                id="remember-me"
+                name="remember-me"
+                type="checkbox"
+                className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+              />
+              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+                Remember me
+              </label>
             </div>
-
-            {error && (
-              <div className="text-center text-red-500 font-medium">
-                {error}
-              </div>
-            )}
-
-            {/* Login Button */}
-            <Button
-              type="submit"
-              className="w-full mt-5 h-16 uppercase tracking-widest text-lg font-semibold bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800 focus:ring-indigo-500 transition-all rounded-xl"
-              disabled={isLoading}
-            >
-              {isLoading ? "Logging In..." : "Login"}
-            </Button>
-
-            {/* Separator */}
-            <div className="relative flex justify-center text-xs uppercase pt-2">
-              <Separator className="absolute inset-x-0 top-1/2 -z-10 h-[1px] bg-gray-200 dark:bg-zinc-700" />
-              <span className="bg-white px-3 text-gray-500 dark:bg-zinc-950 dark:text-gray-400 font-medium">
-                Or continue with
-              </span>
-            </div>
-
-            {/* OAuth Buttons */}
-            <div className="flex items-center justify-center space-x-4 pb-2">
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-12 w-12 rounded-full border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors"
-                aria-label="Sign in with Google"
-              >
-                <FaGoogle className="h-5 w-5" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-12 w-12 rounded-full border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors"
-                aria-label="Sign in with Github"
-              >
-                <FaGithub className="h-5 w-5" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-12 w-12 rounded-full border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors"
-                aria-label="Sign in with LinkedIn"
-              >
-                <FaLinkedinIn className="h-5 w-5" />
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-
-        <CardFooter className="flex justify-center pt-4 text-sm text-gray-500 dark:text-gray-400">
-          <p>
-            Don&apos;t have an account?{" "}
-            <Link
-              href="/signup"
-              className="font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
-            >
-              Sign Up
+            <Link href="#" className="text-sm text-green-600 hover:text-green-500">
+              Forgot password?
             </Link>
-          </p>
-        </CardFooter>
-      </Card>
+          </div>
+
+          {error && (
+            <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md">
+              {error}
+            </div>
+          )}
+
+          <Button
+            type="submit"
+            className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
+            disabled={isLoading}
+          >
+            {isLoading ? "Signing in..." : "Sign in"}
+          </Button>
+        </form>
+
+        <div className="mt-6">
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-gray-500">Or continue with</span>
+            </div>
+          </div>
+
+          <div className="mt-6 grid grid-cols-2 gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full inline-flex items-center justify-center gap-2 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-red-50 hover:border-red-300 transition-colors"
+            >
+              <FaGoogle className="h-4 w-4 text-red-500" />
+              Google
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full inline-flex items-center justify-center gap-2 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-blue-50 hover:border-blue-300 transition-colors"
+            >
+              <FaFacebook className="h-4 w-4 text-blue-600" />
+              Facebook
+            </Button>
+          </div>
+        </div>
+
+      <div className="mt-8 text-center">
+        <p className="text-gray-600">
+          Don't have an account?{' '}
+          <Link href="/signup" className="font-semibold text-green-600 hover:text-green-500 transition-colors">
+            Create account
+          </Link>
+        </p>
+      </div>
+
+      <div className="mt-12 pt-8 border-t border-gray-100">
+        <p className="text-center text-sm text-gray-500">
+          By signing in, you agree to our{' '}
+          <Link href="#" className="text-green-600 hover:text-green-500">
+            Terms of Service
+          </Link>{' '}
+          and{' '}
+          <Link href="#" className="text-green-600 hover:text-green-500">
+            Privacy Policy
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }
