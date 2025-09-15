@@ -78,6 +78,7 @@ const userSchema = new mongoose.Schema({
   savedResources: [{ type: mongoose.Schema.Types.ObjectId, ref: "Resource" }],
 
   // System fields
+  isActive: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now },
   lastLogin: { type: Date },
 });

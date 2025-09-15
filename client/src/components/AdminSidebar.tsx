@@ -29,6 +29,11 @@ const sidebarItems = [
     icon: LayoutDashboard,
   },
   {
+    title: 'Users',
+    href: '/admin/users',
+    icon: Users,
+  },
+  {
     title: 'Categories',
     href: '/admin/categories',
     icon: FolderOpen,
@@ -38,11 +43,7 @@ const sidebarItems = [
     href: '/admin/roadmaps',
     icon: BarChart3,
   },
-  {
-    title: 'Users',
-    href: '/admin/users',
-    icon: Users,
-  },
+  
   {
     title: 'Content',
     href: '/admin/content',

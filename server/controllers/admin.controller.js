@@ -1,59 +1,86 @@
 import User from "../models/user.model.js";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 
-export const adminLogin = async (req, res) => {
+// Get all users (Admin only)
+export const getAllUsers = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { search, role, status } = req.query;
     
-    // Check if credentials match admin env variables
-    if (email !== process.env.ADMIN_EMAIL || password !== process.env.ADMIN_PASSWORD) {
-      return res.status(401).json({ message: "Invalid admin credentials" });
+    let filter = {};
+    if (search) {
+      filter.$or = [
+        { username: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } }
+      ];
+    }
+    if (role) filter.role = role;
+    if (status) filter.isActive = status === 'active';
+    
+    const users = await User.find(filter)
+      .select('-password')
+      .sort({ createdAt: -1 });
+    
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Update user status (Admin only)
+export const updateUserStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { isActive } = req.body;
+    
+    const user = await User.findByIdAndUpdate(
+      id,
+      { isActive },
+      { new: true }
+    ).select('-password');
+    
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
     
-    // Find or create admin user
-    let admin = await User.findOne({ email: process.env.ADMIN_EMAIL });
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Update user role (Admin only)
+export const updateUserRole = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { role } = req.body;
     
-    if (!admin) {
-      const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD, 10);
-      admin = new User({
-        username: "admin",
-        email: process.env.ADMIN_EMAIL,
-        password: hashedPassword,
-        role: "admin"
-      });
-      await admin.save();
-    } else {
-      // Ensure existing user has admin role
-      if (admin.role !== "admin") {
-        admin.role = "admin";
-        await admin.save();
-      }
+    const user = await User.findByIdAndUpdate(
+      id,
+      { role },
+      { new: true }
+    ).select('-password');
+    
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
     
-    const token = jwt.sign(
-      { id: admin._id, role: admin.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Delete user (Admin only)
+export const deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
     
-    console.log('Admin login response:', {
-      id: admin._id,
-      username: admin.username,
-      email: admin.email,
-      role: admin.role
-    });
+    const user = await User.findByIdAndDelete(id);
     
-    res.status(200).json({
-      message: "Admin login successful",
-      token,
-      user: {
-        id: admin._id,
-        username: admin.username,
-        email: admin.email,
-        role: admin.role
-      }
-    });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    
+    res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
