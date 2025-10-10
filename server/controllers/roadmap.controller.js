@@ -44,15 +44,10 @@ export const getRoadmap = async (req, res) => {
 // Create roadmap (Admin only)
 export const createRoadmap = async (req, res) => {
   try {
-    console.log('Creating roadmap with data:', req.body);
-    console.log('User ID:', req.user.id);
-    
     const roadmapData = {
       ...req.body,
       creator: req.user.id,
     };
-    
-    console.log('Final roadmap data:', roadmapData);
     
     const roadmap = new Roadmap(roadmapData);
     await roadmap.save();
@@ -62,7 +57,6 @@ export const createRoadmap = async (req, res) => {
     
     res.status(201).json(roadmap);
   } catch (error) {
-    console.error('Roadmap creation error:', error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -71,6 +65,8 @@ export const createRoadmap = async (req, res) => {
 export const updateRoadmap = async (req, res) => {
   try {
     const { id } = req.params;
+    console.log('Updating roadmap with ID:', id);
+    console.log('Update data:', req.body);
     
     const roadmap = await Roadmap.findByIdAndUpdate(
       id,
@@ -80,12 +76,15 @@ export const updateRoadmap = async (req, res) => {
     .populate("category", "name icon color")
     .populate("creator", "username email");
     
+    console.log('Roadmap found:', roadmap ? 'Yes' : 'No');
+    
     if (!roadmap) {
       return res.status(404).json({ message: "Roadmap not found" });
     }
     
     res.status(200).json(roadmap);
   } catch (error) {
+    console.error('Update roadmap error:', error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -123,6 +122,181 @@ export const toggleRoadmapStatus = async (req, res) => {
     
     if (!roadmap) {
       return res.status(404).json({ message: "Roadmap not found" });
+    }
+    
+    res.status(200).json(roadmap);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Update level (Admin only)
+export const updateLevel = async (req, res) => {
+  try {
+    const { id, levelId } = req.params;
+    console.log('Updating level:', levelId, 'in roadmap:', id);
+    console.log('Level data:', req.body);
+    
+    const roadmap = await Roadmap.findOneAndUpdate(
+      { _id: id, "levels.id": levelId },
+      { $set: { "levels.$": { ...req.body, id: levelId } } },
+      { new: true }
+    )
+    .populate("category", "name icon color")
+    .populate("creator", "username email");
+    
+    console.log('Level update result:', roadmap ? 'Success' : 'Failed');
+    
+    if (!roadmap) {
+      return res.status(404).json({ message: "Roadmap or level not found" });
+    }
+    
+    res.status(200).json(roadmap);
+  } catch (error) {
+    console.error('Update level error:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Delete level (Admin only)
+export const deleteLevel = async (req, res) => {
+  try {
+    const { id, levelId } = req.params;
+    
+    const roadmap = await Roadmap.findByIdAndUpdate(
+      id,
+      { $pull: { levels: { id: levelId } } },
+      { new: true }
+    )
+    .populate("category", "name icon color")
+    .populate("creator", "username email");
+    
+    if (!roadmap) {
+      return res.status(404).json({ message: "Roadmap not found" });
+    }
+    
+    res.status(200).json(roadmap);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Update node (Admin only)
+export const updateNode = async (req, res) => {
+  try {
+    const { id, levelId, nodeId } = req.params;
+    
+    const roadmap = await Roadmap.findOneAndUpdate(
+      { 
+        _id: id, 
+        "levels.id": levelId,
+        "levels.nodes.id": nodeId 
+      },
+      { $set: { "levels.$[level].nodes.$[node]": { ...req.body, id: nodeId } } },
+      { 
+        new: true,
+        arrayFilters: [
+          { "level.id": levelId },
+          { "node.id": nodeId }
+        ]
+      }
+    )
+    .populate("category", "name icon color")
+    .populate("creator", "username email");
+    
+    if (!roadmap) {
+      return res.status(404).json({ message: "Roadmap, level, or node not found" });
+    }
+    
+    res.status(200).json(roadmap);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Delete node (Admin only)
+export const deleteNode = async (req, res) => {
+  try {
+    const { id, levelId, nodeId } = req.params;
+    
+    const roadmap = await Roadmap.findOneAndUpdate(
+      { _id: id, "levels.id": levelId },
+      { $pull: { "levels.$.nodes": { id: nodeId } } },
+      { new: true }
+    )
+    .populate("category", "name icon color")
+    .populate("creator", "username email");
+    
+    if (!roadmap) {
+      return res.status(404).json({ message: "Roadmap or level not found" });
+    }
+    
+    res.status(200).json(roadmap);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Update topic (Admin only)
+export const updateTopic = async (req, res) => {
+  try {
+    const { id, levelId, nodeId, topicId } = req.params;
+    
+    const roadmap = await Roadmap.findOneAndUpdate(
+      { 
+        _id: id, 
+        "levels.id": levelId,
+        "levels.nodes.id": nodeId,
+        "levels.nodes.topics.id": topicId
+      },
+      { $set: { "levels.$[level].nodes.$[node].topics.$[topic]": { ...req.body, id: topicId } } },
+      { 
+        new: true,
+        arrayFilters: [
+          { "level.id": levelId },
+          { "node.id": nodeId },
+          { "topic.id": topicId }
+        ]
+      }
+    )
+    .populate("category", "name icon color")
+    .populate("creator", "username email");
+    
+    if (!roadmap) {
+      return res.status(404).json({ message: "Roadmap, level, node, or topic not found" });
+    }
+    
+    res.status(200).json(roadmap);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Delete topic (Admin only)
+export const deleteTopic = async (req, res) => {
+  try {
+    const { id, levelId, nodeId, topicId } = req.params;
+    
+    const roadmap = await Roadmap.findOneAndUpdate(
+      { 
+        _id: id, 
+        "levels.id": levelId,
+        "levels.nodes.id": nodeId 
+      },
+      { $pull: { "levels.$[level].nodes.$[node].topics": { id: topicId } } },
+      { 
+        new: true,
+        arrayFilters: [
+          { "level.id": levelId },
+          { "node.id": nodeId }
+        ]
+      }
+    )
+    .populate("category", "name icon color")
+    .populate("creator", "username email");
+    
+    if (!roadmap) {
+      return res.status(404).json({ message: "Roadmap, level, or node not found" });
     }
     
     res.status(200).json(roadmap);

@@ -39,6 +39,7 @@ export default function DashboardNavbar() {
 
   const navLinks = [
     { title: 'Categories', href: '/categories' },
+    { title: 'Roadmaps', href: '/roadmaps' },
     { title: 'Learn', href: '/learn' },
     { title: 'Practice', href: '/practice' },
     { title: 'Quizzes', href: '/quizzes' },
@@ -97,7 +98,7 @@ export default function DashboardNavbar() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-8 w-8 rounded-full hover:bg-gray-800">
-                <Avatar className="h-8 w-8">
+                <Avatar className="h-8 w-8 cursor-pointer">
                   <AvatarImage src="/avatars/01.png" alt="@shadcn" />
                   <AvatarFallback>{user?.username?.[0] || 'GT'}</AvatarFallback>
                 </Avatar>
@@ -114,25 +115,25 @@ export default function DashboardNavbar() {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link href="/profile" className="flex items-center">
+                <Link href="/profile" className="flex items-center cursor-pointer">
                   <User className="mr-2 h-4 w-4" />
                   Profile
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/settings" className="flex items-center">
+                <Link href="/settings" className="flex items-center cursor-pointer">
                   <Settings className="mr-2 h-4 w-4" />
                   Settings
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/my-learnings" className="flex items-center">
+                <Link href="/my-learnings" className="flex items-center cursor-pointer">
                   <Book className="mr-2 h-4 w-4" />
                   My Learnings
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/my-badges" className="flex items-center">
+                <Link href="/my-badges" className="flex items-center cursor-pointer">
                   <Award className="mr-2 h-4 w-4" />
                   My Badges
                 </Link>
@@ -141,7 +142,7 @@ export default function DashboardNavbar() {
                 <>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link href="/admin/categories" className="flex items-center">
+                    <Link href="/admin/categories" className="flex items-center cursor-pointer">
                       <Settings className="mr-2 h-4 w-4" />
                       Admin Panel
                     </Link>
@@ -149,8 +150,8 @@ export default function DashboardNavbar() {
                 </>
               )}
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={logout} className="text-red-600">
-                <LogOut className="mr-2 h-4 w-4" />
+              <DropdownMenuItem onClick={logout} className="text-red-600 cursor-pointer hover:text-white ">
+                <LogOut className="mr-2 h-4 w-4 text-red-500" />
                 Logout
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -190,8 +191,8 @@ export default function DashboardNavbar() {
                     })}
                   </div>
                   <div className="mt-auto pt-4 border-t border-gray-800">
-                    <div className="flex items-center space-x-3 p-2 mb-2">
-                      <Avatar className="h-9 w-9">
+                    <div className="flex items-center space-x-3 p-2 mb-2 ">
+                      <Avatar className="h-9 w-9 cursor-pointer">
                         <AvatarImage src="/avatars/01.png" alt="@shadcn" />
                         <AvatarFallback>{user?.username?.[0] || 'GT'}</AvatarFallback>
                       </Avatar>

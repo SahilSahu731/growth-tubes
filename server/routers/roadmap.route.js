@@ -9,6 +9,12 @@ import {
   addLevel,
   addNode,
   addTopic,
+  updateLevel,
+  deleteLevel,
+  updateNode,
+  deleteNode,
+  updateTopic,
+  deleteTopic,
   forkRoadmap,
 } from "../controllers/roadmap.controller.js";
 import { protect } from "../middlewares/auth.middleware.js";
@@ -28,8 +34,20 @@ router.post("/", protect, isAdmin, createRoadmap);
 router.put("/:id", protect, isAdmin, updateRoadmap);
 router.delete("/:id", protect, isAdmin, deleteRoadmap);
 router.patch("/:id/status", protect, isAdmin, toggleRoadmapStatus);
+
+// Level management
 router.post("/:id/levels", protect, isAdmin, addLevel);
+router.put("/:id/levels/:levelId", protect, isAdmin, updateLevel);
+router.delete("/:id/levels/:levelId", protect, isAdmin, deleteLevel);
+
+// Node management
 router.post("/:id/levels/:levelId/nodes", protect, isAdmin, addNode);
+router.put("/:id/levels/:levelId/nodes/:nodeId", protect, isAdmin, updateNode);
+router.delete("/:id/levels/:levelId/nodes/:nodeId", protect, isAdmin, deleteNode);
+
+// Topic management
 router.post("/:id/levels/:levelId/nodes/:nodeId/topics", protect, isAdmin, addTopic);
+router.put("/:id/levels/:levelId/nodes/:nodeId/topics/:topicId", protect, isAdmin, updateTopic);
+router.delete("/:id/levels/:levelId/nodes/:nodeId/topics/:topicId", protect, isAdmin, deleteTopic);
 
 export default router;

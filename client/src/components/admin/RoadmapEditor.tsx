@@ -13,6 +13,7 @@ import { Plus, Save, ArrowLeft, Trash2, FolderPlus, BookOpen } from "lucide-reac
 import { useRoadmapStore } from "@/store/roadmapStore";
 import { useAuthStore } from "@/store/authStore";
 import { toast } from "sonner";
+import EditableLevel from "./EditableLevel";
 
 interface Topic {
   id: string;
@@ -56,7 +57,17 @@ export default function RoadmapEditor({ roadmap, onSave, onBack }: RoadmapEditor
   const [selectedLevel, setSelectedLevel] = useState<Level | null>(null);
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [activeTab, setActiveTab] = useState("levels");
-  const { addLevel: addLevelAPI, addNode: addNodeAPI, addTopic: addTopicAPI } = useRoadmapStore();
+  const { 
+    addLevel: addLevelAPI, 
+    addNode: addNodeAPI, 
+    addTopic: addTopicAPI,
+    updateLevel: updateLevelAPI,
+    deleteLevel: deleteLevelAPI,
+    updateNode: updateNodeAPI,
+    deleteNode: deleteNodeAPI,
+    updateTopic: updateTopicAPI,
+    deleteTopic: deleteTopicAPI
+  } = useRoadmapStore();
   const { token } = useAuthStore();
 
   const handleAddLevel = async () => {
@@ -114,6 +125,50 @@ export default function RoadmapEditor({ roadmap, onSave, onBack }: RoadmapEditor
     }
   };
 
+  const handleUpdateLevel = async (levelId: string, levelData: any) => {
+    try {
+      const updatedRoadmap = await updateLevelAPI(roadmap._id, levelId, levelData, token!);
+      setLevels(updatedRoadmap.levels);
+      toast.success('Level updated successfully!');
+    } catch (error) {
+      toast.error('Failed to update level');
+    }
+  };
+
+  const handleDeleteLevel = async (levelId: string) => {
+    if (!confirm('Are you sure you want to delete this level?')) return;
+    
+    try {
+      const updatedRoadmap = await deleteLevelAPI(roadmap._id, levelId, token!);
+      setLevels(updatedRoadmap.levels);
+      toast.success('Level deleted successfully!');
+    } catch (error) {
+      toast.error('Failed to delete level');
+    }
+  };
+
+  const handleUpdateNode = async (levelId: string, nodeId: string, nodeData: any) => {
+    try {
+      const updatedRoadmap = await updateNodeAPI(roadmap._id, levelId, nodeId, nodeData, token!);
+      setLevels(updatedRoadmap.levels);
+      toast.success('Node updated successfully!');
+    } catch (error) {
+      toast.error('Failed to update node');
+    }
+  };
+
+  const handleDeleteNode = async (levelId: string, nodeId: string) => {
+    if (!confirm('Are you sure you want to delete this node?')) return;
+    
+    try {
+      const updatedRoadmap = await deleteNodeAPI(roadmap._id, levelId, nodeId, token!);
+      setLevels(updatedRoadmap.levels);
+      toast.success('Node deleted successfully!');
+    } catch (error) {
+      toast.error('Failed to delete node');
+    }
+  };
+
   const saveRoadmap = () => {
     onSave({
       ...roadmap,
@@ -160,49 +215,17 @@ export default function RoadmapEditor({ roadmap, onSave, onBack }: RoadmapEditor
           
           <div className="space-y-4">
             {levels.map((level) => (
-              <Card key={level.id}>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle className="text-lg">{level.title || `Level ${level.order}`}</CardTitle>
-                      <p className="text-sm text-muted-foreground">{level.nodes.length} nodes</p>
-                    </div>
-                    <div className="flex space-x-2">
-                      <Button size="sm" onClick={() => handleAddNode(level.id)}>
-                        <Plus className="w-4 h-4 mr-1" />
-                        Add Node
-                      </Button>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {level.nodes.map((node) => (
-                      <div key={node.id} className="border rounded-lg p-3">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center space-x-2">
-                            <span>{node.icon}</span>
-                            <span className="font-medium text-sm">{node.title || 'Untitled'}</span>
-                          </div>
-                          <Button size="sm" variant="outline" onClick={() => handleAddTopic(level.id, node.id)}>
-                            <BookOpen className="w-3 h-3" />
-                          </Button>
-                        </div>
-                        <div className="space-y-1">
-                          {node.topics.map((topic) => (
-                            <div key={topic.id} className="text-xs bg-gray-100 px-2 py-1 rounded">
-                              {topic.title || 'Untitled Topic'}
-                            </div>
-                          ))}
-                          {node.topics.length === 0 && (
-                            <p className="text-xs text-muted-foreground">No topics yet</p>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+              <EditableLevel
+                key={level.id}
+                level={level}
+                roadmapId={roadmap._id}
+                onUpdate={(levelData) => handleUpdateLevel(level.id, levelData)}
+                onDelete={() => handleDeleteLevel(level.id)}
+                onAddNode={() => handleAddNode(level.id)}
+                onUpdateNode={(nodeId, nodeData) => handleUpdateNode(level.id, nodeId, nodeData)}
+                onDeleteNode={(nodeId) => handleDeleteNode(level.id, nodeId)}
+                onAddTopic={(nodeId) => handleAddTopic(level.id, nodeId)}
+              />
             ))}
             
             {levels.length === 0 && (

@@ -164,4 +164,88 @@ export const useRoadmapStore = create<RoadmapState>((set, get) => ({
       throw error;
     }
   },
+
+  updateLevel: async (roadmapId, levelId, levelData, token) => {
+    try {
+      const response = await axios.put(`${ROADMAP_API_ROUTE}/${roadmapId}/levels/${levelId}`, levelData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      set(state => ({
+        roadmaps: state.roadmaps.map(r => r._id === roadmapId ? response.data : r)
+      }));
+      return response.data;
+    } catch (error: any) {
+      throw error;
+    }
+  },
+
+  deleteLevel: async (roadmapId, levelId, token) => {
+    try {
+      const response = await axios.delete(`${ROADMAP_API_ROUTE}/${roadmapId}/levels/${levelId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      set(state => ({
+        roadmaps: state.roadmaps.map(r => r._id === roadmapId ? response.data : r)
+      }));
+      return response.data;
+    } catch (error: any) {
+      throw error;
+    }
+  },
+
+  updateNode: async (roadmapId, levelId, nodeId, nodeData, token) => {
+    try {
+      const response = await axios.put(`${ROADMAP_API_ROUTE}/${roadmapId}/levels/${levelId}/nodes/${nodeId}`, nodeData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      set(state => ({
+        roadmaps: state.roadmaps.map(r => r._id === roadmapId ? response.data : r)
+      }));
+      return response.data;
+    } catch (error: any) {
+      throw error;
+    }
+  },
+
+  deleteNode: async (roadmapId, levelId, nodeId, token) => {
+    try {
+      const response = await axios.delete(`${ROADMAP_API_ROUTE}/${roadmapId}/levels/${levelId}/nodes/${nodeId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      set(state => ({
+        roadmaps: state.roadmaps.map(r => r._id === roadmapId ? response.data : r)
+      }));
+      return response.data;
+    } catch (error: any) {
+      throw error;
+    }
+  },
+
+  updateTopic: async (roadmapId, levelId, nodeId, topicId, topicData, token) => {
+    try {
+      const response = await axios.put(`${ROADMAP_API_ROUTE}/${roadmapId}/levels/${levelId}/nodes/${nodeId}/topics/${topicId}`, topicData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      set(state => ({
+        roadmaps: state.roadmaps.map(r => r._id === roadmapId ? response.data : r)
+      }));
+      return response.data;
+    } catch (error: any) {
+      throw error;
+    }
+  },
+
+  deleteTopic: async (roadmapId, levelId, nodeId, topicId, token) => {
+    try {
+      const response = await axios.delete(`${ROADMAP_API_ROUTE}/${roadmapId}/levels/${levelId}/nodes/${nodeId}/topics/${topicId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      set(state => ({
+        roadmaps: state.roadmaps.map(r => r._id === roadmapId ? response.data : r)
+      }));
+      return response.data;
+    } catch (error: any) {
+      throw error;
+    }
+  },
 }));
