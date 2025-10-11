@@ -19,7 +19,6 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: [true, "Please provide a password"],
     minlength: 8,
     select: false, // Prevents the password from being returned in queries by default
   },
@@ -37,6 +36,7 @@ const userSchema = new mongoose.Schema({
     enum: ["user", "creator", "admin"],
     default: "user",
   },
+  googleId: { type: String, unique: true, sparse: true }, // for OAuth users
   subscription: {
     isActive: { type: Boolean, default: false }, // true = paid user
     plan: {

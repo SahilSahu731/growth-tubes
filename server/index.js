@@ -1,11 +1,14 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import userRoutes from './routers/user.route.js';
-import categoryRoutes from './routers/category.route.js';
-import roadmapRoutes from './routers/roadmap.route.js';
-import adminRoutes from './routers/admin.route.js';
+import session from 'express-session';
+import cookieParser from 'cookie-parser';
+import userRoutes from './routes/user.route.js';
+import categoryRoutes from './routes/category.route.js';
+import roadmapRoutes from './routes/roadmap.route.js';
+import adminRoutes from './routes/admin.route.js';
 import connectDB from './config/db.js';
+import passport from 'passport';
 
 dotenv.config();
 
@@ -18,10 +21,27 @@ connectDB();
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 app.use(cors({
     origin: process.env.CLIENT_URL,
     credentials: true
 }))
+
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    },
+  })
+);
+
+// Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
 
 
 // Routes

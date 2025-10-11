@@ -3,21 +3,13 @@
 import { useState } from "react";
 import { FaGoogle, FaFacebook } from "react-icons/fa";
 import { FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import axios from "axios";
-import { USER_API_ROUTE } from "@/lib/constants";
+import { USER_API_ROUTE, AUTH_API_ROUTE } from "@/lib/constants";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 
@@ -30,6 +22,11 @@ export default function LoginCard() {
 
   const router = useRouter();
   const login = useAuthStore((state) => state.login);
+
+  const handleGoogleLogin = () => {
+    // open server auth route (server mounts auth router at /api/auth)
+    window.location.href = `${USER_API_ROUTE}/auth/google`;
+  };
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -157,29 +154,30 @@ export default function LoginCard() {
             </div>
           </div>
 
-          <div className="mt-6 grid grid-cols-2 gap-3">
+          <div className="mt-6">
             <Button
               type="button"
               variant="outline"
+              onClick={handleGoogleLogin}
               className="w-full inline-flex items-center justify-center gap-2 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-red-50 hover:border-red-300 transition-colors"
             >
               <FaGoogle className="h-4 w-4 text-red-500" />
               Google
             </Button>
-            <Button
+            {/* <Button
               type="button"
               variant="outline"
               className="w-full inline-flex items-center justify-center gap-2 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-blue-50 hover:border-blue-300 transition-colors"
             >
               <FaFacebook className="h-4 w-4 text-blue-600" />
               Facebook
-            </Button>
+            </Button> */}
           </div>
         </div>
 
       <div className="mt-8 text-center">
         <p className="text-gray-600">
-          Don't have an account?{' '}
+          Don&apos;t have an account?{' '}
           <Link href="/signup" className="font-semibold text-green-600 hover:text-green-500 transition-colors">
             Create account
           </Link>

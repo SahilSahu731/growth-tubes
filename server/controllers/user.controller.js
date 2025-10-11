@@ -89,6 +89,40 @@ export const logoutUser = (req, res) => {
   res.status(200).json({ message: 'Logged out successfully' });
 };
 
+export const googleAuthCallback = async (req, res) => {
+  try {
+    const token = generateToken(req.user._id);
+    
+    // Redirect to frontend with token
+    res.redirect(`${process.env.CLIENT_URL}/auth/google/callback?token=${token}&userId=${req.user._id}`);
+  } catch (error) {
+    res.redirect(`${process.env.CLIENT_URL}/login?error=authentication_failed`);
+  }
+};
+
+// Get user data after OAuth
+export const getGoogleAuthUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId).select('-password');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    res.json({
+      success: true,
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      profilePic: user.profilePic,
+      bio: user.bio,
+      role: user.role,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+
 export const getUserProfile = (req, res) => {
   res.status(200).json(req.user);
 };
