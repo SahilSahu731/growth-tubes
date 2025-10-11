@@ -117,4 +117,6 @@ passport.use(
   )
 );
 
+console.log('✅ Google OAuth Strategy configured successfully');
+
 export default passport;

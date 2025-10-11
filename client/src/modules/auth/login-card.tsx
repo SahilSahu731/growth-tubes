@@ -1,15 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { FaGoogle, FaFacebook } from "react-icons/fa";
-import { FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
+import { FaGoogle } from "react-icons/fa";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import axios from "axios";
-import { USER_API_ROUTE, AUTH_API_ROUTE } from "@/lib/constants";
+import { USER_API_ROUTE } from "@/lib/constants";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 
