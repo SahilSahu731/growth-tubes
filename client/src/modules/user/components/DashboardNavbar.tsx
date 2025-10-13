@@ -99,8 +99,8 @@ export default function DashboardNavbar() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-8 w-8 rounded-full hover:bg-gray-800">
                 <Avatar className="h-8 w-8 cursor-pointer">
-                  <AvatarImage src="/avatars/01.png" alt="@shadcn" />
-                  <AvatarFallback>{user?.username?.[0] || 'GT'}</AvatarFallback>
+                  <AvatarImage src={user?.profilePic} alt="@shadcn" />
+                  <AvatarFallback>{user?.username?.[0].toUpperCase() || 'GT'}</AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
@@ -193,8 +193,8 @@ export default function DashboardNavbar() {
                   <div className="mt-auto pt-4 border-t border-gray-800">
                     <div className="flex items-center space-x-3 p-2 mb-2 ">
                       <Avatar className="h-9 w-9 cursor-pointer">
-                        <AvatarImage src="/avatars/01.png" alt="@shadcn" />
-                        <AvatarFallback>{user?.username?.[0] || 'GT'}</AvatarFallback>
+                        <AvatarImage src={user?.profilePic || "/avatars/01.png"} alt="@shadcn" />
+                        <AvatarFallback> {user?.profilePic ? <AvatarImage src={user?.profilePic} alt={user?.username || 'GT'} /> : <>{user?.username?.[0] || 'GT'}</>}</AvatarFallback>
                       </Avatar>
                       <div className="flex flex-col text-sm">
                         <span className="font-semibold text-white">{user?.username || 'Guest'}</span>

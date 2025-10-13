@@ -42,6 +42,7 @@ export const registerUser = async (req, res) => {
         success: true,
         message: "User registered successfully",
         _id: user._id,
+        profilePic: user.profilePic,
         username: user.username,
         email: user.email,
         token: generateToken(user._id),
@@ -75,6 +76,7 @@ export const loginUser = async (req, res) => {
       message: "User logged in successfully",
       _id: user._id,
       username: user.username,
+      profilePic: user.profilePic,
       email: user.email,
       token: generateToken(user._id),
     });

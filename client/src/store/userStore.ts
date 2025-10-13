@@ -8,6 +8,7 @@ interface User {
   email: string;
   role: string;
   isActive: boolean;
+  profilePic: string;
   createdAt: string;
 }
 
