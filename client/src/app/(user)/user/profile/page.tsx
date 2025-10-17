@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Calendar, Mail, User as UserIcon, Award, BookOpen, Heart, Edit } from 'lucide-react';
+import EditProfileModal from '@/components/EditProfileModal';
 
 const ProfilePage = () => {
   const { token, user: authUser } = useAuthStore();
@@ -58,8 +59,8 @@ const ProfilePage = () => {
             <div className="flex-1 space-y-2">
               <div className="flex items-center gap-3">
                 <h1 className="text-3xl font-bold text-gray-900">{user.username}</h1>
-                <Badge variant={user.subscription.isActive ? 'default' : 'secondary'}>
-                  {user.subscription.plan.toUpperCase()}
+                <Badge variant={user.subscription?.isActive ? 'default' : 'secondary'}>
+                  {user.subscription?.plan.toUpperCase()}
                 </Badge>
               </div>
               <div className="flex items-center gap-2 text-gray-600">
@@ -74,10 +75,7 @@ const ProfilePage = () => {
                 <span>Joined {new Date(user.createdAt).toLocaleDateString()}</span>
               </div>
             </div>
-            <Button variant="outline" className="flex items-center gap-2">
-              <Edit className="w-4 h-4" />
-              Edit Profile
-            </Button>
+            <EditProfileModal user={user} onUpdate={setUser} />
           </div>
         </CardContent>
       </Card>
@@ -87,28 +85,28 @@ const ProfilePage = () => {
         <Card>
           <CardContent className="p-4 text-center">
             <BookOpen className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-blue-600">{user.curiosityPaths.length}</p>
+            <p className="text-2xl font-bold text-blue-600">{user.curiosityPaths?.length}</p>
             <p className="text-sm text-gray-600">Learning Paths</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
             <Award className="w-8 h-8 text-yellow-600 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-yellow-600">{user.curiosityPaths.filter(p => p.completed).length}</p>
+            <p className="text-2xl font-bold text-yellow-600">{user.curiosityPaths?.filter(p => p.completed).length}</p>
             <p className="text-sm text-gray-600">Completed</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
             <Heart className="w-8 h-8 text-red-600 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-red-600">{user.savedResources.length}</p>
+            <p className="text-2xl font-bold text-red-600">{user?.savedResources?.length}</p>
             <p className="text-sm text-gray-600">Saved Resources</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
             <UserIcon className="w-8 h-8 text-green-600 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-green-600">{user.boards.length}</p>
+            <p className="text-2xl font-bold text-green-600">{user?.boards?.length}</p>
             <p className="text-sm text-gray-600">Boards</p>
           </CardContent>
         </Card>
@@ -120,9 +118,9 @@ const ProfilePage = () => {
           <CardTitle>Learning Progress</CardTitle>
         </CardHeader>
         <CardContent>
-          {user.curiosityPaths.length > 0 ? (
+          {user?.curiosityPaths?.length > 0 ? (
             <div className="space-y-4">
-              {user.curiosityPaths.map((path, index) => (
+              {user?.curiosityPaths?.map((path, index) => (
                 <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                   <div>
                     <h4 className="font-semibold">{path.pathId?.title || 'Untitled Path'}</h4>
@@ -168,9 +166,9 @@ const ProfilePage = () => {
           <CardTitle>Growth Journal</CardTitle>
         </CardHeader>
         <CardContent>
-          {user.growthJournal.length > 0 ? (
+          {user?.growthJournal?.length > 0 ? (
             <div className="space-y-4">
-              {user.growthJournal.slice(0, 3).map((entry, index) => (
+              {user?.growthJournal?.slice(0, 3).map((entry, index) => (
                 <div key={index} className="p-4 bg-gray-50 rounded-lg">
                   <p className="text-gray-700">{entry.entry}</p>
                   <p className="text-xs text-gray-500 mt-2">

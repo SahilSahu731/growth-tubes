@@ -5,6 +5,7 @@ import { useAuthStore } from '@/store/authStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,7 +22,11 @@ import {
   Bell,
   Settings,
   Award,
-  Book
+  Book,
+  Crown,
+  Shield,
+  Calendar,
+  Heart
 } from 'lucide-react';
 import {
   Sheet,
@@ -29,27 +34,38 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
 export default function DashboardNavbar() {
   const { user, logout, isAdmin } = useAuthStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [notifications] = useState(3); // Mock notification count
   const pathname = usePathname();
+  const router = useRouter();
 
   const navLinks = [
+    { title: 'Dashboard', href: '/dashboard' },
     { title: 'Categories', href: '/categories' },
     { title: 'Roadmaps', href: '/roadmaps' },
     { title: 'Learn', href: '/learn' },
     { title: 'Practice', href: '/practice' },
     { title: 'Quizzes', href: '/quizzes' },
     { title: 'Explore', href: '/explore' },
-    { title: 'Manage', href: '/manage' },
   ];
 
-  useEffect(() => {
-    console.log(user)
-  }, [pathname]);
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
+  const handleLogout = () => {
+    logout();
+    router.push('/login');
+  };
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-gray-800 bg-black">
@@ -81,17 +97,29 @@ export default function DashboardNavbar() {
         {/* Search & User Menu */}
         <div className="flex items-center space-x-4">
           {/* Search Bar */}
-          <div className="hidden md:flex relative">
+          <form onSubmit={handleSearch} className="hidden md:flex relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
-              placeholder="Search..."
-              className="pl-10 w-64 bg-gray-900 border-gray-700 text-white placeholder:text-gray-400"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search courses, topics..."
+              className="pl-10 w-64 bg-gray-900 border-gray-700 text-white placeholder:text-gray-400 focus:border-green-500"
             />
-          </div>
+          </form>
 
           {/* Notifications */}
-          <Button variant="ghost" size="icon" className="hidden md:flex text-gray-300 hover:text-white hover:bg-gray-800">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="hidden md:flex text-gray-300 hover:text-white hover:bg-gray-800 relative"
+            onClick={() => router.push('/notifications')}
+          >
             <Bell className="h-5 w-5" />
+            {notifications > 0 && (
+              <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs bg-red-500 hover:bg-red-500">
+                {notifications}
+              </Badge>
+            )}
           </Button>
 
           {/* User Dropdown */}
@@ -104,54 +132,82 @@ export default function DashboardNavbar() {
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="end" forceMount>
-              <DropdownMenuLabel className="font-normal">
-                <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">{user?.username || 'Guest'}</p>
-                  <p className="text-xs leading-none text-muted-foreground">
-                    {user?.email || 'guest@example.com'}
-                  </p>
+            <DropdownMenuContent className="w-64" align="end" forceMount>
+              <DropdownMenuLabel className="font-normal p-4">
+                <div className="flex items-center space-x-3">
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={user?.profilePic} alt={user?.username} />
+                    <AvatarFallback className="bg-green-100 text-green-600">
+                      {user?.username?.[0].toUpperCase() || 'GT'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col space-y-1">
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-medium leading-none">{user?.username || 'Guest'}</p>
+                      {user?.role === 'admin' && <Crown className="h-3 w-3 text-yellow-500" />}
+                      {user?.role === 'creator' && <Shield className="h-3 w-3 text-blue-500" />}
+                    </div>
+                    <p className="text-xs leading-none text-muted-foreground">
+                      {user?.email || 'guest@example.com'}
+                    </p>
+                    <Badge variant="secondary" className="w-fit text-xs">
+                      {user?.subscription?.plan?.toUpperCase() || 'FREE'}
+                    </Badge>
+                  </div>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
                 <Link href="/user/profile" className="flex items-center cursor-pointer">
                   <User className="mr-2 h-4 w-4" />
-                  Profile
+                  My Profile
                 </Link>
               </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/dashboard" className="flex items-center cursor-pointer">
+                  <Calendar className="mr-2 h-4 w-4" />
+                  Dashboard
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/my-courses" className="flex items-center cursor-pointer">
+                  <Book className="mr-2 h-4 w-4" />
+                  My Courses
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/achievements" className="flex items-center cursor-pointer">
+                  <Award className="mr-2 h-4 w-4" />
+                  Achievements
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/favorites" className="flex items-center cursor-pointer">
+                  <Heart className="mr-2 h-4 w-4" />
+                  Favorites
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
                 <Link href="/settings" className="flex items-center cursor-pointer">
                   <Settings className="mr-2 h-4 w-4" />
                   Settings
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/my-learnings" className="flex items-center cursor-pointer">
-                  <Book className="mr-2 h-4 w-4" />
-                  My Learnings
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/my-badges" className="flex items-center cursor-pointer">
-                  <Award className="mr-2 h-4 w-4" />
-                  My Badges
-                </Link>
-              </DropdownMenuItem>
               {isAdmin && (
                 <>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link href="/admin/categories" className="flex items-center cursor-pointer">
-                      <Settings className="mr-2 h-4 w-4" />
+                    <Link href="/admin/dashboard" className="flex items-center cursor-pointer text-purple-600">
+                      <Crown className="mr-2 h-4 w-4" />
                       Admin Panel
                     </Link>
                   </DropdownMenuItem>
                 </>
               )}
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={logout} className="text-red-600 cursor-pointer hover:text-white ">
-                <LogOut className="mr-2 h-4 w-4 text-red-500" />
+              <DropdownMenuItem onClick={handleLogout} className="text-red-600 cursor-pointer focus:text-red-600">
+                <LogOut className="mr-2 h-4 w-4" />
                 Logout
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -203,7 +259,7 @@ export default function DashboardNavbar() {
                     </div>
                     <Button 
                       variant="ghost" 
-                      onClick={() => { logout(); setIsMobileMenuOpen(false); }} 
+                      onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }} 
                       className="w-full justify-start text-gray-300 hover:text-white hover:bg-gray-800"
                     >
                       <LogOut className="mr-2 h-4 w-4" />

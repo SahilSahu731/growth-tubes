@@ -166,27 +166,46 @@ export const getUserProfile = async (req, res) => {
 };
 
 export const updateUserProfile = async (req, res) => {
-  const user = await User.findById(req.user._id);
+  try {
+    const user = await User.findById(req.user._id);
 
-  if (user) {
-    user.username = req.body.username || user.username;
-    user.email = req.body.email || user.email;
-    user.bio = req.body.bio || user.bio;
-    if (req.body.password) {
-      const salt = await bcrypt.genSalt(10);
-      user.password = await bcrypt.hash(req.body.password, salt);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
 
-    const updatedUser = await user.save();
+    // Only allow updating specific fields (no email or password)
+    const allowedUpdates = ['username', 'bio', 'profilePic', 'interests'];
+    const updates = {};
+
+    allowedUpdates.forEach(field => {
+      if (req.body[field] !== undefined) {
+        updates[field] = req.body[field];
+      }
+    });
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      updates,
+      { new: true, runValidators: true }
+    ).select('-password');
 
     res.json({
-      _id: updatedUser._id,
-      username: updatedUser.username,
-      email: updatedUser.email,
-      bio: updatedUser.bio,
-      token: generateToken(updatedUser._id),
+      success: true,
+      message: "Profile updated successfully",
+      user: {
+        _id: updatedUser._id,
+        username: updatedUser.username,
+        email: updatedUser.email,
+        bio: updatedUser.bio,
+        profilePic: updatedUser.profilePic,
+        interests: updatedUser.interests,
+        role: updatedUser.role
+      }
     });
-  } else {
-    res.status(404).json({ message: "User not found" });
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.status(400).json({ message: "Username already exists" });
+    }
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
