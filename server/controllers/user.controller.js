@@ -1,4 +1,7 @@
 import User from "../models/user.model.js";
+import CuriosityPath from "../models/curiosityPath.model.js";
+import Board from "../models/board.model.js";
+import Resource from "../models/resource.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
@@ -125,8 +128,41 @@ export const getGoogleAuthUser = async (req, res) => {
 };
 
 
-export const getUserProfile = (req, res) => {
-  res.status(200).json(req.user);
+export const getUserProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id)
+      .select('-password')
+      .populate('curiosityPaths.pathId', 'title description')
+      .populate('boards.boardId', 'title')
+      .populate('savedResources', 'title type');
+    
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json({
+      success: true,
+      user: {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        profilePic: user.profilePic,
+        bio: user.bio,
+        role: user.role,
+        subscription: user.subscription,
+        curiosityPaths: user.curiosityPaths,
+        boards: user.boards,
+        growthJournal: user.growthJournal,
+        interests: user.interests,
+        savedResources: user.savedResources,
+        isActive: user.isActive,
+        createdAt: user.createdAt,
+        lastLogin: user.lastLogin
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
 };
 
 export const updateUserProfile = async (req, res) => {
