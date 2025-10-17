@@ -50,7 +50,10 @@ function GoogleCallbackPage() {
               _id: response.data._id,
               username: response.data.username,
               email: response.data.email,
+              profilePic: response.data.profilePic,
+              bio: response.data.bio,
               role: response.data.role,
+              subscription: response.data.subscription,
             },
             token
           );

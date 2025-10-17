@@ -24,7 +24,7 @@ interface EditProfileModalProps {
 }
 
 const EditProfileModal = ({ user, onUpdate }: EditProfileModalProps) => {
-  const { token } = useAuthStore();
+  const { token, setUser } = useAuthStore();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -43,6 +43,7 @@ const EditProfileModal = ({ user, onUpdate }: EditProfileModalProps) => {
     try {
       const response = await updateUserProfile(token, formData);
       onUpdate(response.user);
+      setUser(response.user); // Update auth store to sync navbar
       setOpen(false);
     } catch (error) {
       console.error('Failed to update profile:', error);

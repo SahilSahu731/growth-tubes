@@ -67,6 +67,11 @@ export default function DashboardNavbar() {
     router.push('/login');
   };
 
+  useEffect(() => {
+    console.log('Navbar user data:', user);
+    console.log('Profile pic URL:', user?.profilePic);
+  }, [user]);
+
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-gray-800 bg-black">
       <div className="flex h-16 items-center justify-between px-4">
@@ -127,8 +132,14 @@ export default function DashboardNavbar() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-8 w-8 rounded-full hover:bg-gray-800">
                 <Avatar className="h-8 w-8 cursor-pointer">
-                  <AvatarImage src={user?.profilePic} alt="@shadcn" />
-                  <AvatarFallback>{user?.username?.[0].toUpperCase() || 'GT'}</AvatarFallback>
+                  <AvatarImage 
+                    src={user?.profilePic} 
+                    alt={user?.username || 'User'}
+                    onError={(e) => console.log('Avatar image failed to load:', user?.profilePic)}
+                  />
+                  <AvatarFallback className="bg-green-100 text-green-600 font-semibold">
+                    {user?.username?.[0]?.toUpperCase() || 'GT'}
+                  </AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
@@ -136,9 +147,13 @@ export default function DashboardNavbar() {
               <DropdownMenuLabel className="font-normal p-4">
                 <div className="flex items-center space-x-3">
                   <Avatar className="h-10 w-10">
-                    <AvatarImage src={user?.profilePic} alt={user?.username} />
-                    <AvatarFallback className="bg-green-100 text-green-600">
-                      {user?.username?.[0].toUpperCase() || 'GT'}
+                    <AvatarImage 
+                      src={user?.profilePic} 
+                      alt={user?.username || 'User'}
+                      onError={(e) => console.log('Dropdown avatar failed to load:', user?.profilePic)}
+                    />
+                    <AvatarFallback className="bg-green-100 text-green-600 font-semibold">
+                      {user?.username?.[0]?.toUpperCase() || 'GT'}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col space-y-1">
@@ -249,8 +264,10 @@ export default function DashboardNavbar() {
                   <div className="mt-auto pt-4 border-t border-gray-800">
                     <div className="flex items-center space-x-3 p-2 mb-2 ">
                       <Avatar className="h-9 w-9 cursor-pointer">
-                        <AvatarImage src={user?.profilePic || "/avatars/01.png"} alt="@shadcn" />
-                        <AvatarFallback> {user?.profilePic ? <AvatarImage src={user?.profilePic} alt={user?.username || 'GT'} /> : <>{user?.username?.[0] || 'GT'}</>}</AvatarFallback>
+                        <AvatarImage src={user?.profilePic || ''} alt={user?.username || 'User'} />
+                        <AvatarFallback className="bg-green-100 text-green-600 font-semibold">
+                          {user?.username?.[0]?.toUpperCase() || 'GT'}
+                        </AvatarFallback>
                       </Avatar>
                       <div className="flex flex-col text-sm">
                         <span className="font-semibold text-white">{user?.username || 'Guest'}</span>

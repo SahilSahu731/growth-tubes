@@ -45,9 +45,12 @@ export const registerUser = async (req, res) => {
         success: true,
         message: "User registered successfully",
         _id: user._id,
-        profilePic: user.profilePic,
         username: user.username,
         email: user.email,
+        profilePic: user.profilePic || '',
+        bio: user.bio || '',
+        role: user.role,
+        subscription: user.subscription,
         token: generateToken(user._id),
       });
     } else {
@@ -79,8 +82,11 @@ export const loginUser = async (req, res) => {
       message: "User logged in successfully",
       _id: user._id,
       username: user.username,
-      profilePic: user.profilePic,
       email: user.email,
+      profilePic: user.profilePic || '',
+      bio: user.bio || '',
+      role: user.role,
+      subscription: user.subscription,
       token: generateToken(user._id),
     });
   } catch (error) {
@@ -118,9 +124,10 @@ export const getGoogleAuthUser = async (req, res) => {
       _id: user._id,
       username: user.username,
       email: user.email,
-      profilePic: user.profilePic,
-      bio: user.bio,
+      profilePic: user.profilePic || '',
+      bio: user.bio || '',
       role: user.role,
+      subscription: user.subscription,
     });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });

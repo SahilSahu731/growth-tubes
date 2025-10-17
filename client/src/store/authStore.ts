@@ -4,9 +4,16 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 interface User {
   _id: string;
   username: string;
-  profilePic: string;
+  profilePic?: string;
   email: string;
-  role?: string;
+  role?: 'user' | 'creator' | 'admin';
+  bio?: string;
+  subscription?: {
+    isActive: boolean;
+    plan: 'free' | 'monthly' | 'yearly';
+    startDate?: string;
+    endDate?: string;
+  };
 }
 
 interface AuthState {
