@@ -44,7 +44,11 @@ export const useAuthStore = create<AuthState>()(
         isAuthenticated: true, 
         isAdmin: user.role === 'admin' 
       }),
-      setUser: (user) => set({ user, isAuthenticated: !!user, isAdmin: !!user && user.role === 'admin' }),
+      setUser: (user) => set({ 
+        user, 
+        isAuthenticated: !!user, 
+        isAdmin: !!user && user.role === 'admin' 
+      }),
       setToken: (token) => set({ token }),
       initFromCookie: async () => {
         // Only run in browser

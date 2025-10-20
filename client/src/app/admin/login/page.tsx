@@ -34,18 +34,16 @@ export default function AdminLoginPage() {
         password,
       });
 
-      console.log('Admin login response:', response.data);
-      console.log('User role:', response.data.user.role);
-      
-      login(response.data.user, response.data.token);
-      setSuccess('Login successful! Redirecting...');
-      
-      // Check if admin role was set
-      setTimeout(() => {
-        const { isAdmin } = useAuthStore.getState();
-        console.log('After login - isAdmin:', isAdmin);
-        router.push('/admin');
-      }, 1000);
+      if (response.data.success && response.data.user.role === 'admin') {
+        login(response.data.user, response.data.token);
+        setSuccess('Login successful! Redirecting...');
+        
+        setTimeout(() => {
+          router.push('/admin/dashboard');
+        }, 1000);
+      } else {
+        setError('Admin access required');
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Login failed');
     } finally {
@@ -143,6 +141,11 @@ export default function AdminLoginPage() {
             <div className="text-center">
               <p className="text-xs text-gray-500">
                 Authorized personnel only. All access is monitored.
+              </p>
+            </div>
+            <div>
+              <p onClick={() => router.push('/')} className="text-xs text-gray-500 cursor-pointer">
+                Back to home page
               </p>
             </div>
           </CardContent>

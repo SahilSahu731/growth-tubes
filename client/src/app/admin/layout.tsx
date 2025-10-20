@@ -1,27 +1,55 @@
 "use client";
 
-import AdminGuard from "@/components/AdminGuard";
-import AdminSidebar from "@/components/AdminSidebar";
-import { usePathname } from "next/navigation";
-import { Toaster } from "sonner";
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/store/authStore';
 
-const AdminLayout = ({ children }: { children: React.ReactNode }) => {
-  const pathname = usePathname();
-  const isLoginPage = pathname === '/admin/login';
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+  const { user, isAuthenticated, token, setUser } = useAuthStore();
 
-  if (isLoginPage) {
-    return <>{children}</>;
-  }
+  useEffect(() => {
+    const checkAdmin = async () => {
+      console.log('Admin layout checking...');
+      
+      if (!isAuthenticated || !token) {
+        router.push('/login');
+        return;
+      }
 
-  return (
-    <AdminGuard>
-      <div className="flex min-h-screen bg-gray-50">
-        <AdminSidebar />
-        <main className="flex-1 lg:ml-0 p-4 lg:p-8">{children}</main>
-      </div>
-      <Toaster richColors position="top-right" />
-    </AdminGuard>
-  );
-};
+      try {
+        console.log('Calling admin API from layout...');
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/check`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
 
-export default AdminLayout;
+        console.log('Admin API response:', response.status);
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Admin data:', data);
+          
+          if (data.success && data.isAdmin) {
+            router.push('/admin/dashboard');
+            setUser(data.user);
+          } else {
+            router.push('/dashboard');
+          }
+        } else {
+          router.push('/dashboard');
+        }
+      } catch (error) {
+        console.error('Admin check error:', error);
+        router.push('/dashboard');
+      }
+    };
+
+    checkAdmin();
+  }, [isAuthenticated, token, router, setUser]);
+
+  return <>{children}</>;
+}

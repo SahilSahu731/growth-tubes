@@ -1,66 +1,70 @@
 "use client";
 
-import { useAuthStore } from "@/store/authStore";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/store/authStore';
 
-interface AdminGuardProps {
-  children: React.ReactNode;
-}
-
-export default function AdminGuard({ children }: AdminGuardProps) {
-  const { user, isAuthenticated, isAdmin } = useAuthStore();
+export default function AdminGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const { user, isAuthenticated, token, setUser } = useAuthStore();
   const [isLoading, setIsLoading] = useState(true);
+  const hasCheckedRef = useRef(false);
 
   useEffect(() => {
-    // Wait for store to hydrate
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    if (!isLoading) {
-      console.log('AdminGuard check:', { isAuthenticated, isAdmin, userRole: user?.role });
+    const checkAdminAccess = async () => {
+      if (hasCheckedRef.current) return;
+      hasCheckedRef.current = true;
       
-      if (!isAuthenticated) {
-        console.log('Not authenticated, redirecting to login');
-        router.push("/admin/login");
+      if (!isAuthenticated || !token) {
+        router.push('/login');
         return;
       }
-      
-      if (!isAdmin) {
-        console.log('Not admin, redirecting to dashboard');
-        router.push("/dashboard");
-        return;
+
+      try {
+        console.log('Calling admin check API...');
+        const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/check`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        console.log('Admin API response status:', response.status);
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Admin API response data:', data);
+          
+          if (data.success && data.isAdmin && data.user.role === 'admin') {
+            router.push('/admin/dashboard');
+            console.log('User role:', data.user.role);
+            setUser(data.user);
+            setIsLoading(false);
+          } else {
+            console.log('User is not admin, redirecting to dashboard');
+            router.push('/dashboard');
+          }
+        } else {
+          console.log('Admin API failed, redirecting to dashboard');
+          router.push('/dashboard');
+        }
+      } catch (error) {
+        console.error('Admin check failed:', error);
+        router.push('/dashboard');
       }
-    }
-  }, [isAuthenticated, isAdmin, user, router, isLoading]);
+    };
+
+    checkAdminAccess();
+  }, [isAuthenticated, token, user?.role, router, setUser]);
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p>Loading...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-900">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
   }
 
-  if (!isAuthenticated || !isAdmin) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-600 mb-4">Access denied. Redirecting...</p>
-          <div className="w-6 h-6 border-2 border-red-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
-        </div>
-      </div>
-    );
-  }
-
-  return <>{children}</>;
+  return user?.role === 'admin' ? <>{children}</> : null;
 }
