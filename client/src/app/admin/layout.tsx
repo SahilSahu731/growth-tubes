@@ -1,24 +1,24 @@
 "use client";
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
+import AdminSidebar from '@/components/AdminSidebar';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { user, isAuthenticated, token, setUser } = useAuthStore();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const checkAdmin = async () => {
-      console.log('Admin layout checking...');
-      
       if (!isAuthenticated || !token) {
         router.push('/login');
         return;
       }
 
       try {
-        console.log('Calling admin API from layout...');
         const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/check`, {
           method: 'GET',
           headers: {
@@ -26,30 +26,53 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             'Content-Type': 'application/json',
           },
         });
-
-        console.log('Admin API response:', response.status);
         
         if (response.ok) {
           const data = await response.json();
-          console.log('Admin data:', data);
           
           if (data.success && data.isAdmin) {
-            router.push('/admin/dashboard');
             setUser(data.user);
+            setIsAdmin(true);
           } else {
             router.push('/dashboard');
+            return;
           }
         } else {
           router.push('/dashboard');
+          return;
         }
       } catch (error) {
         console.error('Admin check error:', error);
         router.push('/dashboard');
+        return;
       }
+      
+      setIsLoading(false);
     };
 
     checkAdmin();
   }, [isAuthenticated, token, router, setUser]);
 
-  return <>{children}</>;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-900">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return null;
+  }
+
+  return (
+    <div className="flex min-h-screen bg-gray-100">
+      <AdminSidebar />
+      <div className="flex-1 ml-64">
+        <main className="p-6">
+          {children}
+        </main>
+      </div>
+    </div>
+  );
 }
