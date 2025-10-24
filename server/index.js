@@ -12,6 +12,7 @@ import userRoutes from './routes/user.route.js';
 import categoryRoutes from './routes/category.route.js';
 import roadmapRoutes from './routes/roadmap.route.js';
 import adminRoutes from './routes/admin.route.js';
+import topicRoutes from './routes/topic.route.js';
 import connectDB from './config/db.js';
 
 
@@ -53,6 +54,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/roadmaps', roadmapRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/topics', topicRoutes);
 
 app.get('/', (req, res) => {
   res.json({ 
