@@ -28,6 +28,7 @@ const AdminSidebar = () => {
     { icon: LayoutDashboard, label: 'Dashboard', href: '/admin/dashboard' },
     { icon: Users, label: 'Users', href: '/admin/users' },
     { icon: BookOpen, label: 'Categories', href: '/admin/categories' },
+    { icon: BookOpen, label: 'Topics', href: '/admin/topics' },
     { icon: Map, label: 'Roadmaps', href: '/admin/roadmaps' },
     { icon: BarChart3, label: 'Analytics', href: '/admin/analytics' },
     { icon: Bell, label: 'Notifications', href: '/admin/notifications' },

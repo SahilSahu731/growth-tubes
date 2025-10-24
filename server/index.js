@@ -53,8 +53,8 @@ app.use(passport.session());
 app.use('/api/users', userRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/roadmaps', roadmapRoutes);
-app.use('/api/admin', adminRoutes);
 app.use('/api/topics', topicRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.get('/', (req, res) => {
   res.json({ 
