@@ -1,6 +1,26 @@
 import slugify from "slugify";
 import Topic from "../models/topics.model.js";
 
+// Get all topics (public access)
+export const getAllTopics = async (req, res) => {
+  try {
+    const topics = await Topic.find({ is_active: true })
+      .populate('parent_topic_id', 'name')
+      .sort({ is_featured: -1, createdAt: -1 })
+      .select('-seo -created_by -updated_by');
+
+    res.status(200).json({
+      success: true,
+      data: topics
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 export const createTopic = async (req, res) => {
   try {
     const {
