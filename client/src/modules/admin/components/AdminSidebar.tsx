@@ -33,6 +33,7 @@ export function AdminSidebar() {
     { name: "Browse", icon: Search, href: "/admin/browse" },
     { name: "Labs", icon: ScissorsSquareIcon, href: "/admin/labs" },
     { name: "Quizzes", icon: FileQuestion, href: "/admin/quizzes" },
+    { name: "Analytics", icon: FileQuestion, href: "/admin/analytics" },
   ];
 
   const bottomNavItems = [
